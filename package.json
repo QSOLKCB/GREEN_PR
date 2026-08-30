@@ -1,0 +1,10 @@
+{
+  "name": "green-pr",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline Codex review prediction game",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#090c0a">
+    <meta
+      name="description"
+      content="GREEN PR is an offline prediction game about waiting for the Codex pull-request review."
+    >
+    <title>GREEN PR — Codex Review Prediction Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="game-core.js" defer></script>
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#game">Skip to the game</a>
+    <div class="ambient-grid" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#game" aria-label="GREEN PR game home">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span class="brand-word">GREEN</span><span class="brand-slash">/</span><span>PR</span>
+      </a>
+
+      <div class="system-strip" aria-label="System status">
+        <span class="system-state"><i aria-hidden="true"></i>LOCAL SIMULATION</span>
+        <span class="system-detail">NO NETWORK</span>
+        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">
+          SOUND&nbsp; OFF
+        </button>
+      </div>
+    </header>
+
+    <noscript>
+      <div class="noscript">JavaScript is required to run the review simulator. No network access is required.</div>
+    </noscript>
+
+    <main id="game" class="game">
+      <section class="scoreboard" aria-label="Campaign status">
+        <div class="score-cell">
+          <span class="score-label">ROUND</span>
+          <strong><span id="roundNumber">1</span><small>/8</small></strong>
+        </div>
+        <div class="score-cell score-cell--wide">
+          <span class="score-label">REVIEW REPUTATION</span>
+          <strong id="scoreValue">1,000</strong>
+        </div>
+        <div class="score-cell">
+          <span class="score-label">STREAK</span>
+          <strong><span id="streakValue">0</span><small>×</small></strong>
+        </div>
+        <div class="score-cell score-cell--seed">
+          <span class="score-label">CAMPAIGN SEED</span>
+          <strong id="seedValue">--------</strong>
+        </div>
+      </section>
+
+      <section class="stage" id="stage" data-state="briefing" aria-label="Current pull request">
+        <article class="dossier" aria-labelledby="prTitle">
+          <header class="panel-heading">
+            <div>
+              <span class="eyebrow">PULL REQUEST DOSSIER</span>
+              <h1 id="prTitle">Loading review target…</h1>
+            </div>
+            <span class="pr-badge" id="prBadge">PR #1</span>
+          </header>
+
+          <div class="branch-line">
+            <span class="branch-icon" aria-hidden="true">⑂</span>
+            <code id="branchValue">feat/loading</code>
+            <span aria-hidden="true">@</span>
+            <code id="commitValue">0000000000</code>
+          </div>
+
+          <dl class="metrics">
+            <div>
+              <dt>CHANGE CLASS</dt>
+              <dd id="changeTypeValue">—</dd>
+            </div>
+            <div>
+              <dt>DIFF</dt>
+              <dd><span class="plus" id="additionsValue">+0</span> <span class="minus" id="deletionsValue">−0</span></dd>
+            </div>
+            <div>
+              <dt>FILES</dt>
+              <dd id="filesValue">0</dd>
+            </div>
+            <div>
+              <dt>TESTS</dt>
+              <dd><span id="testsValue">0</span> green</dd>
+            </div>
+          </dl>
+
+          <section class="signals" aria-labelledby="signalsTitle">
+            <div class="section-heading">
+              <h2 id="signalsTitle">PRE-REVIEW SIGNALS</h2>
+              <span id="passValue">PASS 01</span>
+            </div>
+            <ul id="signalList" class="signal-list"></ul>
+          </section>
+        </article>
+
+        <section class="reactor-panel" aria-labelledby="reactorTitle">
+          <div class="reactor-readout">
+            <span class="eyebrow">CODEX REVIEW CORE</span>
+            <span class="latency" id="latencyValue">QUEUE: ARMED</span>
+          </div>
+
+          <div class="review-core" id="reviewCore" data-verdict="pending" aria-hidden="true">
+            <div class="core-ticks"></div>
+            <div class="core-ring core-ring--outer"></div>
+            <div class="core-ring core-ring--middle"></div>
+            <div class="core-ring core-ring--inner"></div>
+            <div class="core-sweep"></div>
+            <div class="core-centre">
+              <span id="coreGlyph">?</span>
+            </div>
+          </div>
+
+          <div class="reactor-copy">
+            <p class="eyebrow" id="reactorKicker">AWAITING PROPHECY</p>
+            <h2 id="reactorTitle">Will the review come back green?</h2>
+            <p id="reactorBody">Read the evidence. Distrust the vibes. Then commit to a prediction.</p>
+          </div>
+
+          <ol class="pipeline" id="pipeline" aria-label="Review progress">
+            <li data-step="queued"><span aria-hidden="true"></span>Queued</li>
+            <li data-step="tests"><span aria-hidden="true"></span>Tests</li>
+            <li data-step="invariants"><span aria-hidden="true"></span>Invariants</li>
+            <li data-step="codex"><span aria-hidden="true"></span>Codex</li>
+          </ol>
+
+          <section class="result-panel" id="resultPanel" aria-labelledby="resultTitle" hidden>
+            <div class="result-heading">
+              <span class="verdict-stamp" id="verdictStamp">GREEN</span>
+              <span class="score-delta" id="scoreDelta">+0</span>
+            </div>
+            <h2 id="resultTitle">Review complete</h2>
+            <p id="resultBody"></p>
+            <div class="fairness-strip">
+              <span>GREEN CHANCE <strong id="chanceReveal">—</strong></span>
+              <span>REVIEW ROLL <strong id="rollReveal">—</strong></span>
+              <span>CALIBRATION <strong id="calibrationValue">—</strong></span>
+            </div>
+            <ol class="finding-list" id="findingList"></ol>
+            <button class="primary-action" id="nextButton" type="button">LOAD NEXT PR</button>
+          </section>
+        </section>
+
+        <aside class="prediction-console" aria-labelledby="predictionTitle">
+          <div class="panel-heading panel-heading--compact">
+            <div>
+              <span class="eyebrow">YOUR CALL</span>
+              <h2 id="predictionTitle">Predict the verdict</h2>
+            </div>
+            <span class="console-light" aria-hidden="true"></span>
+          </div>
+
+          <p class="console-intro">Choose the outcome, then stake your confidence. Certainty pays more—and bleeds more.</p>
+
+          <fieldset class="choice-group">
+            <legend>Verdict</legend>
+            <div class="verdict-choices">
+              <button class="choice choice--green" type="button" data-prediction="green" aria-pressed="false">
+                <span class="choice-code">G</span>
+                <span><strong>GREEN</strong><small>No major issues</small></span>
+              </button>
+              <button class="choice choice--bugs" type="button" data-prediction="bugs" aria-pressed="false">
+                <span class="choice-code">B</span>
+                <span><strong>BUGS</strong><small>Review finds blood</small></span>
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset class="choice-group">
+            <legend>Confidence</legend>
+            <div class="confidence-choices" id="confidenceChoices">
+              <button type="button" data-confidence="0.55" aria-pressed="false">
+                <strong>55%</strong><small>Vibe</small>
+              </button>
+              <button type="button" data-confidence="0.7" aria-pressed="false">
+                <strong>70%</strong><small>Read it</small>
+              </button>
+              <button type="button" data-confidence="0.85" aria-pressed="false">
+                <strong>85%</strong><small>I know</small>
+              </button>
+            </div>
+          </fieldset>
+
+          <div class="wager-readout" aria-live="polite">
+            <span>POSITION</span>
+            <strong id="positionValue">UNCOMMITTED</strong>
+          </div>
+
+          <button class="submit-prediction" id="submitPrediction" type="button" disabled>
+            SUBMIT PROPHECY
+            <span aria-hidden="true">↗</span>
+          </button>
+
+          <div class="keyboard-map" aria-label="Keyboard controls">
+            <span><kbd>G</kbd> Green</span>
+            <span><kbd>B</kbd> Bugs</span>
+            <span><kbd>1–3</kbd> Confidence</span>
+            <span><kbd>Enter</kbd> Submit</span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="ledger" aria-labelledby="ledgerTitle">
+        <div class="section-heading">
+          <h2 id="ledgerTitle">CAMPAIGN LEDGER</h2>
+          <span id="recordValue">LOCAL BEST: —</span>
+        </div>
+        <ol id="ledgerList" class="ledger-list">
+          <li class="ledger-empty">No reviews completed. The optimism remains technically undefeated.</li>
+        </ol>
+      </section>
+
+      <footer class="footer">
+        <p><strong>GREEN PR v1.0.0</strong> · A deterministic parody simulation, not an actual Codex predictor.</p>
+        <p>Runs entirely on this device. No telemetry. All .yml files are executable until proven otherwise.</p>
+      </footer>
+    </main>
+
+    <dialog class="modal" id="briefingDialog" aria-labelledby="briefingTitle">
+      <div class="modal-frame">
+        <span class="modal-index">SIMULATION // 001</span>
+        <div class="modal-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <p class="eyebrow">WELCOME, MAINTAINER</p>
+        <h2 id="briefingTitle">Eight pull requests.<br>One increasingly unreliable nervous system.</h2>
+        <p>
+          Inspect each dossier, predict whether Codex returns a green review or a nest of bugs,
+          and choose how certain you are. The verdict is fixed before your prediction.
+        </p>
+        <ul class="rules">
+          <li><strong>Correct + confident</strong><span>Large reputation gain</span></li>
+          <li><strong>Wrong + confident</strong><span>Catastrophic character development</span></li>
+          <li><strong>Same seed</strong><span>Same campaign, every time</span></li>
+        </ul>
+        <button class="primary-action" id="startButton" type="button">BEGIN REVIEW CYCLE</button>
+      </div>
+    </dialog>
+
+    <dialog class="modal modal--summary" id="summaryDialog" aria-labelledby="summaryTitle">
+      <div class="modal-frame">
+        <span class="modal-index">CAMPAIGN // COMPLETE</span>
+        <p class="eyebrow">FINAL CLASSIFICATION</p>
+        <h2 id="summaryTitle">EXACT-HEAD ORACLE</h2>
+        <p id="summaryEpitaph">Codex blinks first.</p>
+        <dl class="summary-grid">
+          <div><dt>SCORE</dt><dd id="summaryScore">0</dd></div>
+          <div><dt>ACCURACY</dt><dd id="summaryAccuracy">0/8</dd></div>
+          <div><dt>CALIBRATION</dt><dd id="summaryCalibration">0%</dd></div>
+          <div><dt>LOCAL BEST</dt><dd id="summaryBest">0</dd></div>
+        </dl>
+        <div class="summary-actions">
+          <button class="primary-action" id="newCampaignButton" type="button">NEW CAMPAIGN</button>
+          <button class="secondary-action" id="replayCampaignButton" type="button">REPLAY THIS SEED</button>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="sr-only" id="announcer" aria-live="polite" aria-atomic="true"></div>
+  </body>
+</html>
