@@ -17,6 +17,7 @@ GREEN PR is a zero-network, dependency-free browser prediction game. It satirise
 - The same `(seed, roundIndex)` pair produces the same complete round.
 - Player input cannot alter or reroll an already generated verdict.
 - The probability and full six-decimal review roll are revealed after resolution.
+- Review rolls are truncated from integer micro-units and always remain in `[0, 1)`.
 - Generated findings cannot contradict evidence already disclosed in the dossier.
 - A `review-33` signal and the displayed pass number always agree.
 - The game never claims to model actual Codex behaviour or real PR risk.
@@ -31,6 +32,7 @@ GREEN PR is a zero-network, dependency-free browser prediction game. It satirise
 - Keep randomness behind `createRng`; do not use `Math.random()` for rounds or verdicts.
 - Keep external URLs, CDNs, hosted fonts, telemetry, and network clients out of the playable files.
 - Preserve keyboard controls, focus states, live announcements, and reduced-motion behaviour.
+- Let focused native controls process Enter before considering the global submission shortcut.
 - Update tests when scoring, probability bounds, or runtime file relationships change.
 - Declare direct signal contradictions in each finding's `conflictsWithSignals` list.
 

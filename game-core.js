@@ -530,7 +530,7 @@
     const hiddenNoise = randomInteger(rng, -8, 8);
     const risk = clamp(18 + changeType.baseRisk + size.risk + signalRisk + hiddenNoise, 8, 92);
     const greenChance = Number((1 - risk / 100).toFixed(2));
-    const outcomeRoll = Number(rng().toFixed(6));
+    const outcomeRoll = Math.floor(rng() * 1_000_000) / 1_000_000;
     const outcome = outcomeRoll < greenChance ? "green" : "bugs";
     const maximumFindings = greenChance < 0.35 ? 5 : greenChance < 0.6 ? 4 : 3;
     const findingCount = outcome === "bugs" ? randomInteger(rng, 1, maximumFindings) : 0;

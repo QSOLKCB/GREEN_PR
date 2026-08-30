@@ -95,6 +95,20 @@ test("the outcome is decided by the disclosed chance and roll", () => {
   }
 });
 
+test("six-decimal outcome rolls never round up to one", () => {
+  const regression = core.generateRound("rare-3013090", 2);
+
+  assert.equal(regression.outcomeRoll, 0.999999);
+  assert.ok(regression.outcomeRoll < 1);
+
+  for (let index = 0; index < 1000; index += 1) {
+    const round = core.generateRound(`micro-unit-${index}`, index % core.TOTAL_ROUNDS);
+    const microUnits = round.outcomeRoll * 1_000_000;
+    assert.ok(Math.abs(microUnits - Math.round(microUnits)) < 1e-6);
+    assert.ok(round.outcomeRoll >= 0 && round.outcomeRoll < 1);
+  }
+});
+
 test("confidence increases both reward and punishment", () => {
   const cautiousCorrect = core.scorePrediction("green", "green", 0.55, 0);
   const certainCorrect = core.scorePrediction("green", "green", 0.85, 0);

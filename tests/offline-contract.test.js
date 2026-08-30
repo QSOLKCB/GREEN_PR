@@ -70,3 +70,23 @@ test("result disclosure and the narrowest ledger preserve their information", ()
     /@media \(max-width: 470px\)[\s\S]*?\.ledger-list\s*{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/,
   );
 });
+
+test("CI attests the pull-request head instead of the synthetic merge commit", () => {
+  const workflow = read(".github/workflows/ci.yml");
+  const exactHeadExpression = "${{ github.event.pull_request.head.sha || github.sha }}";
+
+  assert.match(workflow, /- name: Check out exact head/);
+  assert.equal(workflow.split(exactHeadExpression).length - 1, 2);
+  assert.match(workflow, /run: test "\$\(git rev-parse HEAD\)" = "\$EXPECTED_SHA"/);
+});
+
+test("focused native controls receive Enter before the global shortcut", () => {
+  const script = read("script.js");
+  const guard = script.indexOf("if (ownsNativeEnterActivation(event.target))");
+  const submission = script.indexOf('if (elements.stage.dataset.state === "briefing"', guard);
+
+  assert.match(script, /function ownsNativeEnterActivation\(target\)/);
+  assert.match(script, /target\.closest\('button, a\[href\], input, select, textarea, summary, \[role="button"\]'\)/);
+  assert.ok(guard >= 0, "native Enter guard must exist");
+  assert.ok(submission > guard, "native Enter guard must run before global submission");
+});

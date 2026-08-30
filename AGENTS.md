@@ -10,3 +10,4 @@ These instructions apply to the entire repository.
 6. Run `node --test` before proposing a change.
 7. Keep `README.md` human-facing and `README4AI.md` as the machine-oriented architecture contract.
 8. Never emit a simulated finding that contradicts a signal disclosed to the player.
+9. CI must check out and attest the pull-request head, not GitHub's synthetic merge commit.

@@ -133,6 +133,14 @@
     }, 30);
   }
 
+  function ownsNativeEnterActivation(target) {
+    return Boolean(
+      target
+      && typeof target.closest === "function"
+      && target.closest('button, a[href], input, select, textarea, summary, [role="button"]'),
+    );
+  }
+
   function setInteractive(enabled) {
     for (const button of elements.predictionButtons.concat(elements.confidenceButtons)) {
       button.disabled = !enabled;
@@ -593,6 +601,10 @@
     } else if (["1", "2", "3"].includes(key)) {
       selectConfidence(core.CONFIDENCE_LEVELS[Number(key) - 1]);
     } else if (key === "enter") {
+      if (ownsNativeEnterActivation(event.target)) {
+        return;
+      }
+
       if (elements.stage.dataset.state === "briefing" && !elements.submitPrediction.disabled) {
         event.preventDefault();
         runReview();
