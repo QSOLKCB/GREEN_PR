@@ -11,3 +11,5 @@ These instructions apply to the entire repository.
 7. Keep `README.md` human-facing and `README4AI.md` as the machine-oriented architecture contract.
 8. Never emit a simulated finding that contradicts a signal disclosed to the player.
 9. CI must check out and attest the pull-request head, not GitHub's synthetic merge commit.
+10. GitHub Pages must test before packaging, publish only from `main`, and contain exactly the four offline runtime files.
+11. Pin third-party deployment actions to immutable commit SHAs and retain the readable release tag in a comment.
