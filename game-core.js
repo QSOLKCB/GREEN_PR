@@ -304,6 +304,7 @@
       title: "Regenerate the checked-in site projection",
       body: "Source inputs changed while the deterministic output remained stale.",
       tags: ["projection", "workflow"],
+      conflictsWithSignals: ["fresh-projection"],
     },
     {
       id: "shell-bypass",
@@ -325,6 +326,7 @@
       title: "Bind the graduation claim to the reviewed head",
       body: "Green evidence from an earlier commit cannot attest the current tree.",
       tags: ["contract", "formal", "security"],
+      conflictsWithSignals: ["exact-head"],
     },
     {
       id: "lockfile",
@@ -339,6 +341,7 @@
       title: "Exclude wall-clock state from canonical serialization",
       body: "Two equivalent runs produce different bytes and therefore different IDs.",
       tags: ["projection", "schema", "code"],
+      conflictsWithSignals: ["deterministic-replay", "fresh-projection"],
     },
     {
       id: "unknown-major",
@@ -367,6 +370,7 @@
       title: "Canonicalize map ordering before hashing",
       body: "Insertion order leaks into an identifier claimed to be deterministic.",
       tags: ["projection", "schema", "code"],
+      conflictsWithSignals: ["deterministic-replay", "fresh-projection"],
     },
     {
       id: "signal-delivery",
@@ -467,14 +471,18 @@
     return selected;
   }
 
-  function selectFindings(rng, tags, count) {
+  function selectFindings(rng, tags, count, signals) {
+    const signalIds = new Set(signals.map((signal) => signal.id));
+    const compatible = FINDINGS.filter(
+      (finding) => !(finding.conflictsWithSignals || []).some((signalId) => signalIds.has(signalId)),
+    );
     const relevant = shuffle(
       rng,
-      FINDINGS.filter((finding) => matchesTags(finding, tags)),
+      compatible.filter((finding) => matchesTags(finding, tags)),
     );
     const fallback = shuffle(
       rng,
-      FINDINGS.filter((finding) => !relevant.includes(finding)),
+      compatible.filter((finding) => !relevant.includes(finding)),
     );
 
     return relevant.concat(fallback).slice(0, count);
@@ -526,9 +534,10 @@
     const outcome = outcomeRoll < greenChance ? "green" : "bugs";
     const maximumFindings = greenChance < 0.35 ? 5 : greenChance < 0.6 ? 4 : 3;
     const findingCount = outcome === "bugs" ? randomInteger(rng, 1, maximumFindings) : 0;
-    const findings = selectFindings(rng, changeType.tags.concat(changeType.id), findingCount);
+    const findings = selectFindings(rng, changeType.tags.concat(changeType.id), findingCount, signals);
     const tests = randomInteger(rng, 18, 540);
-    const passNumber = rng() < 0.18 ? randomInteger(rng, 20, 44) : randomInteger(rng, 1, 9);
+    const generatedPassNumber = rng() < 0.18 ? randomInteger(rng, 20, 44) : randomInteger(rng, 1, 9);
+    const passNumber = signals.some((signal) => signal.id === "review-33") ? 33 : generatedPassNumber;
 
     return Object.freeze({
       id: `${hashSeed(`${seed}:${roundIndex}`).toString(16).padStart(8, "0")}`,
@@ -591,6 +600,19 @@
     });
   }
 
+  function parseStoredScore(rawValue) {
+    if (rawValue === null || rawValue === undefined) {
+      return null;
+    }
+
+    if (typeof rawValue === "string" && rawValue.trim() === "") {
+      return null;
+    }
+
+    const score = Number(rawValue);
+    return Number.isFinite(score) ? Math.trunc(score) : null;
+  }
+
   function summarizeCampaign(predictions, finalScore) {
     const safePredictions = Array.isArray(predictions) ? predictions : [];
     const correct = safePredictions.filter((entry) => entry.correct).length;
@@ -638,6 +660,7 @@
     createRng,
     generateRound,
     scorePrediction,
+    parseStoredScore,
     summarizeCampaign,
   });
 });

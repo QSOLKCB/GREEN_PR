@@ -59,3 +59,14 @@ test("the game exposes keyboard, reduced-motion, and live-region support", () =>
   assert.match(css, /prefers-reduced-motion: reduce/);
   assert.match(script, /document\.addEventListener\("keydown"/);
 });
+
+test("result disclosure and the narrowest ledger preserve their information", () => {
+  const css = read("styles.css");
+  const script = read("script.js");
+
+  assert.match(script, /outcomeRoll\.toFixed\(6\)/);
+  assert.match(
+    css,
+    /@media \(max-width: 470px\)[\s\S]*?\.ledger-list\s*{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/,
+  );
+});

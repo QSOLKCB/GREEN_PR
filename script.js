@@ -80,8 +80,7 @@
 
   function readBestScore() {
     try {
-      const stored = Number(window.localStorage.getItem(BEST_SCORE_KEY));
-      return Number.isFinite(stored) && stored > 0 ? Math.floor(stored) : null;
+      return core.parseStoredScore(window.localStorage.getItem(BEST_SCORE_KEY));
     } catch (_error) {
       return null;
     }
@@ -398,7 +397,7 @@
     elements.scoreDelta.textContent = `${scored.delta > 0 ? "+" : ""}${scored.delta}`;
     elements.scoreDelta.dataset.negative = String(scored.delta < 0);
     elements.chanceReveal.textContent = `${Math.round(currentRound.greenChance * 100)}%`;
-    elements.rollReveal.textContent = currentRound.outcomeRoll.toFixed(3);
+    elements.rollReveal.textContent = currentRound.outcomeRoll.toFixed(6);
     elements.calibrationValue.textContent = `${scored.calibration}%`;
 
     if (currentRound.outcome === "green") {

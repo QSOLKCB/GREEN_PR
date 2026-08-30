@@ -52,6 +52,41 @@ test("generated reviews obey the probability and dossier bounds", () => {
   }
 });
 
+test("findings never contradict evidence disclosed in the dossier", () => {
+  for (let seed = 0; seed < 500; seed += 1) {
+    for (let roundIndex = 0; roundIndex < core.TOTAL_ROUNDS; roundIndex += 1) {
+      const round = core.generateRound(String(seed), roundIndex);
+      const signalIds = new Set(round.signals.map((signal) => signal.id));
+
+      for (const finding of round.findings) {
+        for (const conflict of finding.conflictsWithSignals || []) {
+          assert.equal(
+            signalIds.has(conflict),
+            false,
+            `seed ${seed}, round ${roundIndex + 1}: ${finding.id} contradicts ${conflict}`,
+          );
+        }
+      }
+    }
+  }
+});
+
+test("the review-33 signal always displays pass 33", () => {
+  let observed = 0;
+
+  for (let seed = 0; seed < 500; seed += 1) {
+    for (let roundIndex = 0; roundIndex < core.TOTAL_ROUNDS; roundIndex += 1) {
+      const round = core.generateRound(String(seed), roundIndex);
+      if (round.signals.some((signal) => signal.id === "review-33")) {
+        observed += 1;
+        assert.equal(round.passNumber, 33);
+      }
+    }
+  }
+
+  assert.ok(observed > 0, "test sample must exercise review-33");
+});
+
 test("the outcome is decided by the disclosed chance and roll", () => {
   for (let index = 0; index < 100; index += 1) {
     const round = core.generateRound("transparent-verdict", index);
@@ -91,4 +126,13 @@ test("invalid predictions fail closed", () => {
   assert.throws(() => core.scorePrediction("maybe", "green", 0.7, 0), TypeError);
   assert.throws(() => core.scorePrediction("green", "green", 0.99, 0), TypeError);
   assert.throws(() => core.generateRound("seed", -1), TypeError);
+});
+
+test("stored score parsing preserves zero and negative records", () => {
+  assert.equal(core.parseStoredScore(null), null);
+  assert.equal(core.parseStoredScore(""), null);
+  assert.equal(core.parseStoredScore("not-a-score"), null);
+  assert.equal(core.parseStoredScore("0"), 0);
+  assert.equal(core.parseStoredScore("-450"), -450);
+  assert.equal(core.parseStoredScore("123.9"), 123);
 });

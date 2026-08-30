@@ -9,3 +9,4 @@ These instructions apply to the entire repository.
 5. Use safe DOM construction; do not insert generated content with `innerHTML`.
 6. Run `node --test` before proposing a change.
 7. Keep `README.md` human-facing and `README4AI.md` as the machine-oriented architecture contract.
+8. Never emit a simulated finding that contradicts a signal disclosed to the player.

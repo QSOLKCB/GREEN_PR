@@ -1469,6 +1469,10 @@ kbd {
     grid-template-columns: 1fr;
   }
 
+  .ledger-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .summary-actions {
     grid-template-columns: 1fr;
   }
