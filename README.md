@@ -8,6 +8,10 @@ No installation, server, account, API, or network connection is required.
 
 ## Play
 
+Play the hosted build at [qsolkcb.github.io/GREEN_PR](https://qsolkcb.github.io/GREEN_PR/).
+
+To play fully offline:
+
 1. Download or clone the repository.
 2. Open `index.html` in a modern browser.
 3. Survive eight simulated pull requests with your review reputation intact.
@@ -57,6 +61,12 @@ npm test
 ```
 
 The dependency-free test suite verifies deterministic generation, scoring, outcome transparency, accessibility hooks, and the no-network runtime contract.
+
+## Deployment
+
+GitHub Actions validates the same four-file offline runtime on every pull request. A successful push to `main` packages only those files and deploys them to the `github-pages` environment; manual deployments are also restricted to `main`.
+
+Fittingly, that policy lives in `.github/workflows/pages.yml`: one more `.yml` config file with real consequences.
 
 ## Important non-claim
 

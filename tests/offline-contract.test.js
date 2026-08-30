@@ -78,6 +78,47 @@ test("CI attests the pull-request head instead of the synthetic merge commit", (
   assert.match(workflow, /- name: Check out exact head/);
   assert.equal(workflow.split(exactHeadExpression).length - 1, 2);
   assert.match(workflow, /run: test "\$\(git rev-parse HEAD\)" = "\$EXPECTED_SHA"/);
+  assert.match(workflow, /persist-credentials: false/);
+});
+
+test("Pages validates the exact four-file runtime and deploys only main", () => {
+  const workflow = read(".github/workflows/pages.yml");
+  const exactHeadExpression = "${{ github.event.pull_request.head.sha || github.sha }}";
+  const runtimeFiles = ["index.html", "styles.css", "game-core.js", "script.js"];
+
+  assert.match(workflow, /push:\s*\n\s*branches: \[main\]/);
+  assert.match(workflow, /pull_request:/);
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.equal(workflow.split(exactHeadExpression).length - 1, 2);
+  assert.match(workflow, /persist-credentials: false/);
+  assert.match(workflow, /run: node --test/);
+
+  for (const file of runtimeFiles) {
+    assert.match(workflow, new RegExp(`(?:install|printf)[^\\n]*${file.replace(".", "\\.")}`));
+  }
+
+  assert.match(workflow, /diff -u \/tmp\/expected-pages-files \/tmp\/actual-pages-files/);
+  assert.match(workflow, /path: _site/);
+  assert.match(workflow, /if: github\.ref == 'refs\/heads\/main' && github\.event_name != 'pull_request'/);
+  assert.match(workflow, /name: github-pages/);
+  assert.match(workflow, /url: \$\{\{ steps\.deployment\.outputs\.page_url \}\}/);
+});
+
+test("workflow dependencies are pinned to reviewed immutable revisions", () => {
+  const workflows = `${read(".github/workflows/ci.yml")}\n${read(".github/workflows/pages.yml")}`;
+  const approvedActions = [
+    "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
+    "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
+    "actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0",
+    "actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0",
+    "actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0",
+  ];
+
+  for (const action of approvedActions) {
+    assert.ok(workflows.includes(action), `missing approved action pin: ${action}`);
+  }
+
+  assert.doesNotMatch(workflows, /uses:\s+[^@\s]+@v\d+(?:\s|$)/m);
 });
 
 test("focused native controls receive Enter before the global shortcut", () => {

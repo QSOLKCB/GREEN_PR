@@ -23,6 +23,8 @@ GREEN PR is a zero-network, dependency-free browser prediction game. It satirise
 - The game never claims to model actual Codex behaviour or real PR risk.
 - All generated copy enters the DOM through `textContent` or node construction, never `innerHTML`.
 - The browser build has no package or build step.
+- The GitHub Pages artifact contains exactly `index.html`, `styles.css`, `game-core.js`, and `script.js`.
+- Pages deployments run the dependency-free tests first and publish only from `refs/heads/main`.
 - A `.yml` file is not treated as inert documentation merely because someone calls it “config.”
 - Every eight-round campaign deterministically contains exactly one forced `.yml` boss dossier.
 
@@ -34,6 +36,7 @@ GREEN PR is a zero-network, dependency-free browser prediction game. It satirise
 - Preserve keyboard controls, focus states, live announcements, and reduced-motion behaviour.
 - Let focused native controls process Enter before considering the global submission shortcut.
 - Update tests when scoring, probability bounds, or runtime file relationships change.
+- Update the Pages artifact manifest and its contract test together if the runtime file set changes.
 - Declare direct signal contradictions in each finding's `conflictsWithSignals` list.
 
 ## Verification
